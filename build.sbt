@@ -23,13 +23,23 @@ lazy val Constant = new {
 
 
 lazy val devDeps = Seq(
-  "com.typesafe.play"   %% "play-ws"    % "2.5.18",
-  "com.typesafe"        %  "config"     % "1.3.1",
-  "org.scalatest"       %% "scalatest"  % "3.0.3"     % Test
+  "com.typesafe.play"       %%  "play-ws"       % "2.5.18",
+  "com.typesafe"            %   "config"        % "1.3.1",
+  "com.github.nscala-time"  %%  "nscala-time"   % "2.18.0",
+  "org.scalatest"           %%  "scalatest"     % "3.0.3"     % Test
 )
 
 lazy val Resolvers = Seq(
   "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
+)
+
+
+lazy val testSettings: Seq[Def.Setting[_]] = Seq(
+  sourceDirectory in Test := baseDirectory.value / "src/test/scala",
+  resourceDirectory in Test := baseDirectory.value / "src/test/resources",
+  scalaSource in Test := baseDirectory.value / "src/test/scala",
+  // test setup
+  parallelExecution in Test := false
 )
 
 lazy val commonSettings: Seq[Def.Setting[_]] = Seq (
@@ -61,8 +71,10 @@ lazy val commonSettings: Seq[Def.Setting[_]] = Seq (
 )
 
 
-lazy val root = (project in file("."))
+lazy val `system-test` = (project in file("."))
+//  .configs(Test)
   .settings(commonSettings:_*)
+//  .settings(testSettings:_*)
   .settings(
     inThisBuild(List(
       scalaVersion := Versions.scala,

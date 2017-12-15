@@ -1,17 +1,17 @@
-package services.websocket
+package util
 
-import javax.inject.{ Inject, Singleton }
+import javax.inject.{Inject, Singleton}
 
 import scala.concurrent.duration.Duration.Infinite
 import scala.concurrent.duration._
-import scala.concurrent.{ Await, Future }
+import scala.concurrent.{Await, Future}
 
-import play.api.http.{ ContentTypes, Status }
+import play.api.http.{ContentTypes, Status}
 import play.api.libs.json.JsValue
-import play.api.libs.ws.{ WSClient, WSResponse }
-import play.api.mvc.{ Result, Results }
+import play.api.libs.ws.{WSClient, WSResponse}
+import play.api.mvc.{Result, Results}
 import org.slf4j.LoggerFactory
-import com.typesafe.config.{ Config, ConfigFactory }
+import com.typesafe.config.{Config, ConfigFactory}
 
 /**
   * RequestGenerator
