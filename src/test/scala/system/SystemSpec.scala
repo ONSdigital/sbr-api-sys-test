@@ -9,10 +9,10 @@ import play.api.libs.json.JsValue
 import play.api.libs.ws.WSClient
 import org.joda.time.format.DateTimeFormat
 import org.scalatest._
+import com.github.nscala_time.time.Imports.YearMonth
 import com.typesafe.config.{Config, ConfigFactory}
 
 import util.RequestGenerator
-import com.github.nscala_time.time.Imports.YearMonth
 
 class SystemSpec extends AsyncFlatSpec with Matchers with Status {
 
@@ -62,11 +62,12 @@ class SystemSpec extends AsyncFlatSpec with Matchers with Status {
     val period = config.getInt("sbr-control-api.yearmonth.period")
     val yearMonth = yearMonthConversion(period)
     request.singleGETRequest(s"$baseUrl/v1/periods/$period/enterprises/$enterprise").map { resp =>
-      (resp.json \ "id").as[String].toLong shouldEqual enterprise.toLong
+      (resp.json \ "id").as[Long] shouldEqual enterprise.toLong
       (resp.json \ "childrenJson").as[Seq[JsValue]].nonEmpty
+      println(yearMonth.getMonthOfYear.toString)
       (resp.json \ "period").as[String] shouldEqual String.join(DELIMITER, yearMonth.getYear.toString,
-        yearMonth.getMonthOfYear.toString)
-      (resp.json \ "vars").as[String]
+       "0" + yearMonth.getMonthOfYear.toString)
+      (resp.json \ "vars").as[JsValue]
       resp.status shouldEqual OK
       resp.header("Content-Type") shouldEqual Some("application/json")
     }
