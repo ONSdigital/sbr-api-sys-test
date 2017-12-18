@@ -1,17 +1,15 @@
 package system
 
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import play.api.Application
 import play.api.http.Status
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsNull, JsValue}
 import play.api.libs.ws.WSClient
 import org.joda.time.format.DateTimeFormat
 import org.scalatest._
 import com.github.nscala_time.time.Imports.YearMonth
 import com.typesafe.config.{Config, ConfigFactory}
-
 import util.RequestGenerator
 
 class SystemSpec extends AsyncFlatSpec with Matchers with Status {
@@ -33,11 +31,15 @@ class SystemSpec extends AsyncFlatSpec with Matchers with Status {
   private val enterpriseUnit1 = config.getLong("data-item.enterprise.unit.1")
   private val enterpriseUnit2 = config.getLong("data-item.enterprise.unit.2")
   private val legalUnit = config.getInt("data-item.legal.unit")
-  private val vatUnit = config.getLong("")
-  private val payeUnit = config.getString("")
-  private val chUnit = config.getString("")
+  private val vatUnit = config.getLong("vat.unit")
+  private val payeUnit = config.getString("paye.unit")
+  private val chUnit = config.getString("data-item.companies.house.unit")
   private val defaultPeriod = config.getInt("data-item.yearmonth.period")
-  private val expectedPostCode = config.getString("api.sbr.expected.postcode")
+  private val expectedPostCode = config.getString("data-item.expected.postcode")
+  private val expectedENTParent1 = config.getLong("data-item.expected.enterprise.parent.1")
+  private val expectedLEUParent1 = config.getInt("data-item.expected.legal.unit.parent.1")
+  private val expectedBirthDate = config.getInt("expected.birth.date")
+  private val expectedTradingStyle = config.getInt("expected.trading.style")
 
 
   private def yearMonthConversion(period: Int) = YearMonth.parse(period.toString,
@@ -80,6 +82,8 @@ class SystemSpec extends AsyncFlatSpec with Matchers with Status {
 
   "A legal unit search" should "call the bi api to GET result with unit result" in {
     request.singleGETRequest(s"$sbrBaseUrl/v1/leus/$legalUnit").map { resp =>
+      (resp.json \ "parent" \ "ENT").as[String].toLong shouldEqual expectedENTParent1
+      (resp.json \ "unitType").as[String] shouldEqual "LEU"
       resp.status shouldEqual OK
       resp.header("Content-Type") shouldEqual Some(EXPECTED_CONTENT_TYPE)
     }
@@ -99,6 +103,10 @@ class SystemSpec extends AsyncFlatSpec with Matchers with Status {
 
   "A VAT unit search" should "call the admin data to GET result with unit result" in {
     request.singleGETRequest(s"$sbrBaseUrl/v1/vats/$vatUnit").map { resp =>
+      (resp.json \ "parents" \ "ENT").as[String].toLong shouldEqual expectedENTParent1
+      (resp.json \ "parents" \ "LEU").as[String].toInt shouldEqual expectedLEUParent1
+      (resp.json \ "children").as[JsNull.type]
+      (resp.json \ "vars" \  "birthdate").as[String].toInt shouldEqual expectedBirthDate
       resp.status shouldEqual OK
       resp.header("Content-Type") shouldEqual Some(EXPECTED_CONTENT_TYPE)
     }
@@ -106,6 +114,10 @@ class SystemSpec extends AsyncFlatSpec with Matchers with Status {
 
   "A Paye unit search" should "call the admin data to GET result with unit result" in {
     request.singleGETRequest(s"$sbrBaseUrl/v1/payes/$payeUnit").map { resp =>
+      (resp.json \ "parents" \ "ENT").as[String].toLong shouldEqual expectedENTParent1
+      (resp.json \ "parents" \ "LEU").as[String].toInt shouldEqual expectedLEUParent1
+      (resp.json \ "children").as[JsNull.type]
+      (resp.json \ "vars" \  "tradstyle3").as[String].toInt shouldEqual expectedTradingStyle
       resp.status shouldEqual OK
       resp.header("Content-Type") shouldEqual Some(EXPECTED_CONTENT_TYPE)
     }
@@ -113,6 +125,10 @@ class SystemSpec extends AsyncFlatSpec with Matchers with Status {
 
   "A company house reference number (CRN) unit search" should "call the admin data to GET result with unit result" in {
     request.singleGETRequest(s"$sbrBaseUrl/v1/crns/$chUnit").map { resp =>
+      (resp.json \ "parents" \ "ENT").as[String].toLong shouldEqual expectedENTParent1
+      (resp.json \ "parents" \ "LEU").as[String].toInt shouldEqual expectedLEUParent1
+      (resp.json \ "children").as[JsNull.type]
+      (resp.json \ "vars" \  "countryoforigin").as[String] shouldEqual "United Kingdom"
       resp.status shouldEqual OK
       resp.header("Content-Type") shouldEqual Some(EXPECTED_CONTENT_TYPE)
     }
@@ -142,6 +158,12 @@ class SystemSpec extends AsyncFlatSpec with Matchers with Status {
 
   "A VAT unit and period search" should "call the admin data to GET result with unit result" in {
     request.singleGETRequest(s"$sbrBaseUrl/v1/periods/$defaultPeriod/vats/$vatUnit").map { resp =>
+      (resp.json \ "id").as[String] shouldEqual vatUnit
+      (resp.json \ "period").as[String] shouldEqual defaultPeriod
+      (resp.json \ "parents" \ "ENT").as[String].toLong shouldEqual expectedENTParent1
+      (resp.json \ "parents" \ "LEU").as[String].toInt shouldEqual expectedLEUParent1
+      (resp.json \ "children").as[JsNull.type]
+      (resp.json \ "vars" \  "birthdate").as[String].toInt shouldEqual expectedBirthDate
       resp.status shouldEqual OK
       resp.header("Content-Type") shouldEqual Some(EXPECTED_CONTENT_TYPE)
     }
@@ -149,6 +171,12 @@ class SystemSpec extends AsyncFlatSpec with Matchers with Status {
 
   "A Paye unit and period search" should "call the admin data to GET result with unit result" in {
     request.singleGETRequest(s"$sbrBaseUrl/v1/periods/$defaultPeriod/payes/$payeUnit").map { resp =>
+      (resp.json \ "id").as[String] shouldEqual payeUnit
+      (resp.json \ "period").as[String] shouldEqual defaultPeriod
+      (resp.json \ "parents" \ "ENT").as[String].toLong shouldEqual expectedENTParent1
+      (resp.json \ "parents" \ "LEU").as[String].toInt shouldEqual expectedLEUParent1
+      (resp.json \ "children").as[JsNull.type]
+      (resp.json \ "vars" \  "tradstyle3").as[String].toInt shouldEqual expectedTradingStyle
       resp.status shouldEqual OK
       resp.header("Content-Type") shouldEqual Some(EXPECTED_CONTENT_TYPE)
     }
@@ -156,16 +184,16 @@ class SystemSpec extends AsyncFlatSpec with Matchers with Status {
 
   "A company house reference number (CRN) unit and period search" should "call the admin data to GET result with unit result" in {
     request.singleGETRequest(s"$sbrBaseUrl/v1/periods/$defaultPeriod/crns/$chUnit").map { resp =>
+      (resp.json \ "id").as[String] shouldEqual chUnit
+      (resp.json \ "period").as[String] shouldEqual defaultPeriod
+      (resp.json \ "parents" \ "ENT").as[String].toLong shouldEqual expectedENTParent1
+      (resp.json \ "parents" \ "LEU").as[String].toInt shouldEqual expectedLEUParent1
+      (resp.json \ "children").as[JsNull.type]
+      (resp.json \ "vars" \  "countryoforigin").as[String] shouldEqual "United Kingdom"
       resp.status shouldEqual OK
       resp.header("Content-Type") shouldEqual Some(EXPECTED_CONTENT_TYPE)
     }
   }
-
-
-
-
-
-
 
   "Version request" should "GET a version listing" in {
     request.singleGETRequest(s"$sbrBaseUrl/version").map { resp =>
@@ -210,6 +238,32 @@ class SystemSpec extends AsyncFlatSpec with Matchers with Status {
     request.singleGETRequest(s"$controlBaseUrl/v1/units/$enterpriseUnit1").map { resp =>
       resp.json.as[Seq[JsValue]].nonEmpty
       (resp.json.as[Seq[JsValue]].head \ "id").as[String].toLong shouldEqual enterpriseUnit1
+      // has some children matched to list
+      (resp.json.as[Seq[JsValue]].head \ "children").as[JsValue].toString contains UNIT_LIST
+      resp.status shouldEqual OK
+      resp.header("Content-Type") shouldEqual Some(EXPECTED_CONTENT_TYPE)
+    }
+  }
+
+  "A full business name request of ONS with period parameter" should "GET ONS with children links of the given period" in {
+    request.singleGETRequest(s"$controlBaseUrl/v1/periods/$defaultPeriod/units/$enterpriseUnit1").map { resp =>
+      val yearMonth = yearMonthConversion(defaultPeriod)
+      resp.json.as[Seq[JsValue]].nonEmpty
+      (resp.json.as[Seq[JsValue]].head \ "id").as[String].toLong shouldEqual enterpriseUnit1
+      (resp.json.as[Seq[JsValue]].head \ "period").as[String] shouldEqual String.join(DELIMITER, yearMonth.getYear.toString,
+        "0" + yearMonth.getMonthOfYear.toString)
+      // has some children matched to list
+      (resp.json.as[Seq[JsValue]].head \ "children").as[JsValue].toString contains UNIT_LIST
+      resp.status shouldEqual OK
+      resp.header("Content-Type") shouldEqual Some(EXPECTED_CONTENT_TYPE)
+    }
+  }
+
+  "A search on a unit with known type" should "GET ONS record of the specified type only" in {
+    request.singleGETRequest(s"$controlBaseUrl/v1/types/ENT/units/$enterpriseUnit1").map { resp =>
+      resp.json.as[Seq[JsValue]].nonEmpty
+      (resp.json.as[Seq[JsValue]].head \ "id").as[String].toLong shouldEqual enterpriseUnit1
+      (resp.json.as[Seq[JsValue]].head \ "unitType").as[String] shouldEqual "ENT"
       // has some children matched to list
       (resp.json.as[Seq[JsValue]].head \ "children").as[JsValue].toString contains UNIT_LIST
       resp.status shouldEqual OK
