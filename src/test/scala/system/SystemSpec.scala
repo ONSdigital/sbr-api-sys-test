@@ -10,9 +10,9 @@ import org.joda.time.format.DateTimeFormat
 import org.scalatest._
 import com.github.nscala_time.time.Imports.YearMonth
 import com.typesafe.config.{Config, ConfigFactory}
-import util.RequestGenerator
+import util.{RequestGenerator, TestUtils}
 
-class SystemSpec extends AsyncFlatSpec with Matchers with Status {
+class SystemSpec extends TestUtils {
 
   private val UNIT_LIST = List("VAT", "PAYE", "LEU", "CH", "ENT")
   private val REFERENCE_PERIOD_FORMAT = "yyyyMM"
@@ -20,34 +20,7 @@ class SystemSpec extends AsyncFlatSpec with Matchers with Status {
   private val EXPECTED_API_CONTENT_TYPE = "application/json"
   private val EXPECTED_DOCS_CONTENT_TYPE = "text/html; charset=utf-8"
 
-  private val application: Application = new GuiceApplicationBuilder().build
-  private val ws: WSClient = application.injector.instanceOf(classOf[WSClient])
-  private val request = new RequestGenerator(ws)
-  private val config: Config = ConfigFactory.load()
-
-  private val sbrBaseUrl = config.getString("api.sbr.base.url")
-  private val controlBaseUrl = config.getString("api.sbr-control.base.url")
-  private val adminDataBaseUrl = config.getString("api.sbr-admin-data.base.url")
-
-  private val enterpriseUnit1 = config.getLong("data-item.enterprise.unit.1")
-  private val enterpriseUnit2 = config.getLong("data-item.enterprise.unit.2")
-  private val legalUnit = config.getInt("data-item.legal.unit")
-  private val vatUnit = config.getLong("data-item.vat.unit")
-  private val payeUnit = config.getString("data-item.paye.unit")
-  private val chUnit = config.getString("data-item.companies.house.unit")
-  private val defaultPeriod = config.getInt("data-item.yearmonth.period")
-  private val expectedPostCode = config.getString("data-item.expected.postcode")
-  private val expectedENTParent1 = config.getLong("data-item.expected.enterprise.parent.1")
-  private val expectedLEUParent1 = config.getInt("data-item.expected.legal.unit.parent.1")
-  private val expectedBirthDate = config.getInt("data-item.expected.birth.date")
-  private val expectedTradingStyle = config.getInt("data-item.expected.trading.style")
-
-
-  private def yearMonthConversion(period: Int) = YearMonth.parse(period.toString,
-    DateTimeFormat.forPattern(REFERENCE_PERIOD_FORMAT))
-
-  private val defaultYearMonth = yearMonthConversion(defaultPeriod)
-
+  private val defaultYearMonth = yearMonthConversion(defaultPeriod, REFERENCE_PERIOD_FORMAT)
 
 
   behavior of "sbr-api"
@@ -107,6 +80,7 @@ class SystemSpec extends AsyncFlatSpec with Matchers with Status {
     request.singleGETRequest(s"$sbrBaseUrl/v1/vats/$vatUnit").map { resp =>
       (resp.json \ "parents" \ "ENT").as[String].toLong shouldEqual expectedENTParent1
       (resp.json \ "parents" \ "LEU").as[String].toInt shouldEqual expectedLEUParent1
+      // TODO - fix testing null values
 //      (resp.json \ "children").as[JsNull.type]
       (resp.json \ "vars" \  "birthdate").as[String].toInt shouldEqual expectedBirthDate
       resp.status shouldEqual OK
