@@ -81,7 +81,7 @@ class SystemSpec extends TestUtils {
   "A VAT unit search" should "call the admin data to GET result with unit result" taggedAs(Api, Search, VAT) in {
     request.singleGETRequest(s"$sbrBaseUrl/v1/vats/$vatUnit").map { resp =>
       (resp.json \ "parents" \ "ENT").as[String].toLong shouldEqual expectedENTParent1
-      (resp.json \ "parents" \ "LEU").as[String].toInt shouldEqual expectedLEUParent1
+      (resp.json \ "parents" \ "LEU").as[String].toLong shouldEqual expectedLEUParent1
       Option((resp.json \ "children").as[JsValue]).getOrNull shouldEqual JsNull
       (resp.json \ "vars" \  "birthdate").as[String] shouldEqual expectedBirthDate
       resp.status shouldEqual OK
@@ -92,7 +92,7 @@ class SystemSpec extends TestUtils {
   "A Paye unit search" should "call the admin data to GET result with unit result" taggedAs(Api, Search, PAYE) in {
     request.singleGETRequest(s"$sbrBaseUrl/v1/payes/$payeUnit").map { resp =>
       (resp.json \ "parents" \ "ENT").as[String].toLong shouldEqual expectedENTParent1
-      (resp.json \ "parents" \ "LEU").as[String].toInt shouldEqual expectedLEUParent1
+      (resp.json \ "parents" \ "LEU").as[String].toLong shouldEqual expectedLEUParent1
       Option((resp.json \ "children").as[JsValue]).getOrNull shouldEqual JsNull
       (resp.json \ "vars" \  "tradstyle3").as[String].toInt shouldEqual expectedEmployerCat
       resp.status shouldEqual OK
@@ -104,7 +104,7 @@ class SystemSpec extends TestUtils {
     "result" taggedAs(Api, Search, CompanyHouse) in {
     request.singleGETRequest(s"$sbrBaseUrl/v1/crns/$chUnit").map { resp =>
       (resp.json \ "parents" \ "ENT").as[String].toLong shouldEqual expectedENTParent1
-      (resp.json \ "parents" \ "LEU").as[String].toInt shouldEqual expectedLEUParent1
+      (resp.json \ "parents" \ "LEU").as[String].toLong shouldEqual expectedLEUParent1
       Option((resp.json \ "children").as[JsValue]).getOrNull shouldEqual JsNull
       (resp.json \ "vars" \  "countryoforigin").as[String] shouldEqual "United Kingdom"
       resp.status shouldEqual OK
@@ -142,7 +142,7 @@ class SystemSpec extends TestUtils {
       (resp.json \ "period").as[String] shouldEqual String.join(DELIMITER, defaultYearMonth.getYear.toString,
         "0" + defaultYearMonth.getMonthOfYear.toString)
       (resp.json \ "parents" \ "ENT").as[String].toLong shouldEqual expectedENTParent1
-      (resp.json \ "parents" \ "LEU").as[String].toInt shouldEqual expectedLEUParent1
+      (resp.json \ "parents" \ "LEU").as[String].toLong shouldEqual expectedLEUParent1
       Option((resp.json \ "children").as[JsValue]).getOrNull shouldEqual JsNull
       (resp.json \ "vars" \  "birthdate").as[String] shouldEqual expectedBirthDate
       resp.status shouldEqual OK
@@ -156,7 +156,7 @@ class SystemSpec extends TestUtils {
       (resp.json \ "period").as[String] shouldEqual String.join(DELIMITER, defaultYearMonth.getYear.toString,
         "0" + defaultYearMonth.getMonthOfYear.toString)
       (resp.json \ "parents" \ "ENT").as[String].toLong shouldEqual expectedENTParent1
-      (resp.json \ "parents" \ "LEU").as[String].toInt shouldEqual expectedLEUParent1
+      (resp.json \ "parents" \ "LEU").as[String].toLong shouldEqual expectedLEUParent1
       Option((resp.json \ "children").as[JsValue]).getOrNull shouldEqual JsNull
       (resp.json \ "vars" \  "tradstyle3").as[String].toInt shouldEqual expectedEmployerCat
       resp.status shouldEqual OK
@@ -171,7 +171,7 @@ class SystemSpec extends TestUtils {
       (resp.json \ "period").as[String] shouldEqual String.join(DELIMITER, defaultYearMonth.getYear.toString,
         "0" + defaultYearMonth.getMonthOfYear.toString)
       (resp.json \ "parents" \ "ENT").as[String].toLong shouldEqual expectedENTParent1
-      (resp.json \ "parents" \ "LEU").as[String].toInt shouldEqual expectedLEUParent1
+      (resp.json \ "parents" \ "LEU").as[String].toLong shouldEqual expectedLEUParent1
       Option((resp.json \ "children").as[JsValue]).getOrNull shouldEqual JsNull
       (resp.json \ "vars" \  "countryoforigin").as[String] shouldEqual "United Kingdom"
       resp.status shouldEqual OK
