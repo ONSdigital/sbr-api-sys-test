@@ -48,7 +48,7 @@ class SystemSpec extends TestUtils {
       (resp.json.as[Seq[JsValue]].head \ "period").as[String] shouldEqual String.join(DELIMITER,
         defaultYearMonth.getYear.toString, "0" + defaultYearMonth.getMonthOfYear.toString)
       (resp.json.as[Seq[JsValue]].head \ "unitType").as[String] shouldEqual "ENT"
-      (resp.json.as[Seq[JsValue]].head \ "vars" \ "ent_postcode").as[String] shouldEqual "OK16 5XQ"
+      (resp.json.as[Seq[JsValue]].head \ "vars" \ "ent_postcode").as[String] shouldEqual expectedPostCode
       (resp.json.as[Seq[JsValue]].head \ "children").as[JsValue].toString contains UNIT_LIST
       (resp.json.as[Seq[JsValue]].head \ "childrenJson").as[Seq[JsValue]].nonEmpty
       resp.status shouldEqual OK
@@ -83,7 +83,7 @@ class SystemSpec extends TestUtils {
       (resp.json \ "parents" \ "ENT").as[String].toLong shouldEqual expectedENTParent1
       (resp.json \ "parents" \ "LEU").as[String].toInt shouldEqual expectedLEUParent1
       Option((resp.json \ "children").as[JsValue]).getOrNull shouldEqual JsNull
-      (resp.json \ "vars" \  "birthdate").as[String].toInt shouldEqual expectedBirthDate
+      (resp.json \ "vars" \  "birthdate").as[String] shouldEqual expectedBirthDate
       resp.status shouldEqual OK
       resp.header("Content-Type") shouldEqual Some(EXPECTED_API_CONTENT_TYPE)
     }
@@ -94,7 +94,7 @@ class SystemSpec extends TestUtils {
       (resp.json \ "parents" \ "ENT").as[String].toLong shouldEqual expectedENTParent1
       (resp.json \ "parents" \ "LEU").as[String].toInt shouldEqual expectedLEUParent1
       Option((resp.json \ "children").as[JsValue]).getOrNull shouldEqual JsNull
-      (resp.json \ "vars" \  "tradstyle3").as[String].toInt shouldEqual expectedTradingStyle
+      (resp.json \ "vars" \  "tradstyle3").as[String].toInt shouldEqual expectedEmployerCat
       resp.status shouldEqual OK
       resp.header("Content-Type") shouldEqual Some(EXPECTED_API_CONTENT_TYPE)
     }
@@ -144,7 +144,7 @@ class SystemSpec extends TestUtils {
       (resp.json \ "parents" \ "ENT").as[String].toLong shouldEqual expectedENTParent1
       (resp.json \ "parents" \ "LEU").as[String].toInt shouldEqual expectedLEUParent1
       Option((resp.json \ "children").as[JsValue]).getOrNull shouldEqual JsNull
-      (resp.json \ "vars" \  "birthdate").as[String].toInt shouldEqual expectedBirthDate
+      (resp.json \ "vars" \  "birthdate").as[String] shouldEqual expectedBirthDate
       resp.status shouldEqual OK
       resp.header("Content-Type") shouldEqual Some(EXPECTED_API_CONTENT_TYPE)
     }
@@ -158,7 +158,7 @@ class SystemSpec extends TestUtils {
       (resp.json \ "parents" \ "ENT").as[String].toLong shouldEqual expectedENTParent1
       (resp.json \ "parents" \ "LEU").as[String].toInt shouldEqual expectedLEUParent1
       Option((resp.json \ "children").as[JsValue]).getOrNull shouldEqual JsNull
-      (resp.json \ "vars" \  "tradstyle3").as[String].toInt shouldEqual expectedTradingStyle
+      (resp.json \ "vars" \  "tradstyle3").as[String].toInt shouldEqual expectedEmployerCat
       resp.status shouldEqual OK
       resp.header("Content-Type") shouldEqual Some(EXPECTED_API_CONTENT_TYPE)
     }
