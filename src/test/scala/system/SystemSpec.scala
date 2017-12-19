@@ -220,7 +220,7 @@ class SystemSpec extends TestUtils {
   "A full business name request" should "GET ONS with children links" taggedAs(Control, Search, Enterprise) in {
     request.singleGETRequest(s"$controlBaseUrl/v1/units/$enterpriseUnit1").map { resp =>
       resp.json.as[Seq[JsValue]].nonEmpty
-      (resp.json.as[Seq[JsValue]].head \ "id").as[String].toLong shouldEqual expectedENTParent1
+      (resp.json.as[Seq[JsValue]].head \ "id").as[String].toLong shouldEqual enterpriseUnit1
       // has some children matched to list
       (resp.json.as[Seq[JsValue]].head \ "children").as[JsValue].toString contains UNIT_LIST
       resp.status shouldEqual OK
@@ -256,7 +256,7 @@ class SystemSpec extends TestUtils {
     Control, Search, PeriodSearch, TypeSearch, Enterprise) in {
     request.singleGETRequest(s"$controlBaseUrl/v1/periods/$defaultPeriod/types/ENT/units/$enterpriseUnit1").map {
       resp =>
-      (resp.json.as[JsValue] \ "id").as[String].toLong shouldEqual expectedENTParent1
+      (resp.json.as[JsValue] \ "id").as[String].toLong shouldEqual enterpriseUnit1
       // has some children matched to list
       (resp.json.as[JsValue] \ "children").as[JsValue].toString contains UNIT_LIST
       resp.status shouldEqual OK
@@ -267,7 +267,7 @@ class SystemSpec extends TestUtils {
   "An enterprise search using ONS full name" should "GET ONS children links and enterprise details" taggedAs(Control,
     Search, PeriodSearch, Enterprise) in {
     request.singleGETRequest(s"$controlBaseUrl/v1/periods/$defaultPeriod/enterprises/$enterpriseUnit1").map { resp =>
-      (resp.json \ "id").as[Long] shouldEqual expectedENTParent1
+      (resp.json \ "id").as[Long] shouldEqual enterpriseUnit1
       (resp.json \ "childrenJson").as[Seq[JsValue]].nonEmpty
       (resp.json \ "period").as[String] shouldEqual String.join(DELIMITER, defaultYearMonth.getYear.toString,
        "0" + defaultYearMonth.getMonthOfYear.toString)
