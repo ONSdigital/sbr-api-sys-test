@@ -23,7 +23,7 @@ trait TestUtils extends AsyncFlatSpec with Matchers with Status {
 
   protected lazy val enterpriseUnit1: Long = config.getLong("data-item.enterprise.unit.1")
   protected lazy val enterpriseUnit2: Long = config.getLong("data-item.enterprise.unit.2")
-  protected lazy val legalUnit: Int = config.getInt("data-item.legal.unit")
+  protected lazy val legalUnit: Long = config.getLong("data-item.legal.unit")
   protected lazy val vatUnit: Long = config.getLong("data-item.vat.unit")
   protected lazy val payeUnit: String = config.getString("data-item.paye.unit")
   protected lazy val chUnit: String = config.getString("data-item.companies.house.unit")

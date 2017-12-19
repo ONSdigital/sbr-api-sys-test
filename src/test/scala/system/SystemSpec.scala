@@ -246,7 +246,7 @@ class SystemSpec extends TestUtils {
       (resp.json.as[JsValue] \ "id").as[String].toLong shouldEqual vatUnit
       // has some children matched to list
       (resp.json.as[JsValue] \ "parents" \ "ENT").as[String].toLong shouldEqual enterpriseUnit1
-      (resp.json.as[JsValue] \ "parents" \ "LEU").as[String].toInt shouldEqual legalUnit
+      (resp.json.as[JsValue] \ "parents" \ "LEU").as[String].toLong shouldEqual legalUnit
       resp.status shouldEqual OK
       resp.header("Content-Type") shouldEqual Some(EXPECTED_API_CONTENT_TYPE)
     }
