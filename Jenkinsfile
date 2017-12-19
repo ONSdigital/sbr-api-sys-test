@@ -55,35 +55,40 @@ pipeline {
             steps {
                 script {
                     env.NODE_STAGE = "Bundle"
-                }
-                colourText("info", "Bundling.... adding application.conf")
-                if (BRANCH_NAME == BRANCH_DEV) {
-                    env.DEPLOY_NAME = DEPLOY_DEV
-                }
-                else if  (BRANCH_NAME == BRANCH_TEST) {
-                    env.DEPLOY_NAME = DEPLOY_TEST
-                }
-                else if (BRANCH_NAME == BRANCH_PROD) {
-                    env.DEPLOY_NAME = DEPLOY_PROD
-                }
-                else {
-                    colourText("info", "No matching branch")
+                    if (BRANCH_NAME == BRANCH_DEV) {
+                        env.DEPLOY_NAME = DEPLOY_DEV
+                    }
+                    else if  (BRANCH_NAME == BRANCH_TEST) {
+                        env.DEPLOY_NAME = DEPLOY_TEST
+                    }
+                    else if (BRANCH_NAME == BRANCH_PROD) {
+                        env.DEPLOY_NAME = DEPLOY_PROD
+                    }
+                    else {
+                        colourText("info", "No matching branch")
+                    }
                 }
                 dir('conf') {
                     git(url: "$GITLAB_URL/StatBusReg/${MODULE_NAME}.git", credentialsId: GITLAB_CREDS, branch: "${BRANCH_DEV}")
                 }
-                // stash name: "zip"
+                colourText("info", "Bundling.... adding application.conf")
+                sh "cp conf/${env.DEPLOY_NAME}/application.conf src/test/resources"
             }
         }
         stage('Testing'){
             agent any
+            when {
+                anyOf {
+                    branch BRANCH_DEV
+                    branch BRANCH_TEST
+                    branch BRANCH_PROD
+                }
+            }
             steps {
                 colourText("info", "Building ${env.BUILD_ID} on ${env.JENKINS_URL} from branch ${env.BRANCH_NAME}")
                 script {
-                    sh """
-                        cp conf/${env.DEPLOY_NAME}/application.conf src/test/resources
-                        $SBT clean compile test
-                    """
+                    colourText("info", "Bundling.... adding application.conf")
+                    sh "$SBT clean compile test"
 //                    stash name: 'compiled'
                 }
             }
