@@ -7,6 +7,7 @@ import org.scalatest.{AsyncFlatSpec, Matchers}
 import play.api.Application
 import play.api.http.Status
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.libs.json.{JsNull, JsValue}
 import play.api.libs.ws.WSClient
 
 trait TestUtils extends AsyncFlatSpec with Matchers with Status {
@@ -35,5 +36,14 @@ trait TestUtils extends AsyncFlatSpec with Matchers with Status {
 
   protected def yearMonthConversion(period: Int, format: String) = YearMonth.parse(period.toString,
     DateTimeFormat.forPattern(format))
+
+  implicit class orElseNull(js: Option[JsValue]) {
+    def getOrNull: JsValue = {
+      js match {
+        case Some(null) => JsNull
+        case Some(j: JsValue) => j
+      }
+    }
+  }
 
 }
