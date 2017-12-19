@@ -30,7 +30,7 @@ trait TestUtils extends AsyncFlatSpec with Matchers with Status {
   protected lazy val defaultPeriod: Int = config.getInt("data-item.yearmonth.period")
   protected lazy val expectedPostCode: String = config.getString("data-item.expected.postcode")
   protected lazy val expectedENTParent1: Long = config.getLong("data-item.expected.enterprise.parent.1")
-  protected lazy val expectedLEUParent1: Int = config.getInt("data-item.expected.legal.unit.parent.1")
+  protected lazy val expectedLEUParent1: Long = config.getLong("data-item.expected.legal.unit.parent.1")
   protected lazy val expectedBirthDate: String = config.getString("data-item.expected.birth.date")
   protected lazy val expectedEmployerCat: Int = config.getInt("data-item.expected.employer.cat")
 
