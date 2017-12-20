@@ -12,10 +12,11 @@ import play.api.libs.ws.WSClient
 
 trait TestUtils extends AsyncFlatSpec with Matchers with Status {
 
-  protected val application: Application = new GuiceApplicationBuilder().build
-  protected val ws: WSClient = application.injector.instanceOf(classOf[WSClient])
+  private val application: Application = new GuiceApplicationBuilder().build
+  private val ws: WSClient = application.injector.instanceOf(classOf[WSClient])
+  private val config: Config = ConfigFactory.load()
+  
   protected val request = new RequestGenerator(ws)
-  protected val config: Config = ConfigFactory.load()
 
   protected lazy val sbrBaseUrl: String = config.getString("api.sbr.base.url")
   protected lazy val controlBaseUrl: String = config.getString("api.sbr-control.base.url")
