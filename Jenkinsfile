@@ -42,6 +42,14 @@ pipeline {
                 }
             }
         }
+        stage ('Build') {
+            agent any
+            steps {
+                script {
+                    sh "$SBT clean compile"
+                }
+            }
+        }
         // bundle all libs and dependencies
         stage ('Bundle') {
             agent any
