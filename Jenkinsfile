@@ -19,6 +19,8 @@ pipeline {
         ORGANIZATION = "ons"
         TEAM = "sbr"
         MODULE_NAME = "sbr-api-sys-test"
+
+        STAGE = "NONE"
     }
     options {
         skipDefaultCheckout()
@@ -27,6 +29,13 @@ pipeline {
         timestamps()
     }
     agent any
+    parameters{
+        choice(
+            choices: 'Cloud Foundry\nGateway',
+            description: 'Choose a system migration test suite option - either for Cloud Foundry or gateway. Note testing the gateway also tests the respective CF app.',
+            name: 'SYS_TEST_TYPE'
+        )
+    }
     stages {
         stage('Checkout'){
             agent any
@@ -38,7 +47,7 @@ pipeline {
                 script {
                     version = '1.0.' + env.BUILD_NUMBER
                     currentBuild.displayName = version
-                    env.NODE_STAGE = "Checkout"
+                    STAGE = "Checkout"
                 }
             }
         }
@@ -46,6 +55,7 @@ pipeline {
             agent any
             steps {
                 script {
+                    colourText("info", "Running system tests for ${SYS_TEST_TYPE}")
                     sh "$SBT clean compile"
                 }
             }
@@ -62,7 +72,7 @@ pipeline {
             }
             steps {
                 script {
-                    env.NODE_STAGE = "Bundle"
+                    STAGE = "Bundle"
                     if (BRANCH_NAME == BRANCH_DEV) {
                         env.DEPLOY_NAME = DEPLOY_DEV
                     }
@@ -79,8 +89,9 @@ pipeline {
                 dir('conf') {
                     git(url: "$GITLAB_URL/StatBusReg/${MODULE_NAME}.git", credentialsId: GITLAB_CREDS, branch: "${BRANCH_DEV}")
                 }
-                colourText("info", "Bundling.... adding application.conf")
-                sh "cp conf/${env.DEPLOY_NAME}/application.conf src/test/resources"
+                sysTestDirectory = params.SYS_TEST_TYPE.toLowerCase().replaceAll("\\s","")
+                colourText("info", "Bundling.... adding application.conf from ${sysTestDirectory} directory")
+                sh "cp conf/${env.DEPLOY_NAME}/${sysTestDirectory}/application.conf src/test/resources"
             }
         }
         stage('Testing'){
@@ -103,7 +114,7 @@ pipeline {
             post {
                 always {
                     script {
-                        env.NODE_STAGE = "Testing"
+                        STAGE = "Testing"
                     }
                 }
                 success {
@@ -129,11 +140,11 @@ pipeline {
         }
         unstable {
             colourText("warn", "Something went wrong, build finished with result ${currentResult}. This may be caused by failed tests, code violation or in some cases unexpected interrupt.")
-            sendNotifications currentBuild.result, "\$SBR_EMAIL_LIST", "${env.NODE_STAGE}"
+            sendNotifications currentBuild.result, "\$SBR_EMAIL_LIST", "${STAGE}"
         }
         failure {
-            colourText("warn","Process failed at: ${env.NODE_STAGE}")
-            sendNotifications currentBuild.result, "\$SBR_EMAIL_LIST", "${env.NODE_STAGE}"
+            colourText("warn","Process failed at: ${STAGE}")
+            sendNotifications currentBuild.result, "\$SBR_EMAIL_LIST", "${STAGE}"
         }
     }
 }
