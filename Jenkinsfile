@@ -89,7 +89,7 @@ pipeline {
                 dir('conf') {
                     git(url: "$GITLAB_URL/StatBusReg/${MODULE_NAME}.git", credentialsId: GITLAB_CREDS, branch: "${BRANCH_DEV}")
                 }
-                sysTestDirectory = params.SYS_TEST_TYPE.toLowerCase().replaceAll("\\s","")
+                def sysTestDirectory = params.SYS_TEST_TYPE.toLowerCase().replaceAll("\\s","")
                 colourText("info", "Bundling.... adding application.conf from ${sysTestDirectory} directory")
                 sh "cp conf/${env.DEPLOY_NAME}/${sysTestDirectory}/application.conf src/test/resources"
             }
