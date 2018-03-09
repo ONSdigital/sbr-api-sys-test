@@ -107,7 +107,11 @@ pipeline {
                 colourText("info", "Building ${env.BUILD_ID} on ${env.JENKINS_URL} from branch ${env.BRANCH_NAME}")
                 script {
                     colourText("info", "Bundling.... adding application.conf")
-                    sh "$SBT clean compile test"
+                    if (params.SYS_TEST_TYPE == "Gateway") {
+                        sh "$SBT clean compile test-only -- -n Gateway"
+                    } else {
+                        sh "$SBT clean compile test-only -- -n CloudFoundry"
+                    }
 //                    stash name: 'compiled'
                 }
             }

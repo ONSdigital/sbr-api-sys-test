@@ -28,7 +28,7 @@ class SystemSpec extends TestUtils {
   /**
     * GET REQUESTS
     */
-  "A unit id search" should "return the corresponding unit record" taggedAs(Api, Search, Enterprise) in {
+  "A unit id search" should "return the corresponding unit record" taggedAs(CloudFoundry, Gateway, Api, Search, Enterprise) in {
     request.singleGETRequest(s"$sbrBaseUrl/v1/search?id=$enterpriseUnit2").map{ resp =>
       resp.json.as[Seq[JsValue]].nonEmpty shouldEqual true
       (resp.json.as[Seq[JsValue]].head \ "unitType").as[String] shouldEqual "ENT"
@@ -40,7 +40,7 @@ class SystemSpec extends TestUtils {
     }
   }
 
-  "A unit and period" should "return the specific unit record of the specified period" taggedAs(Api, Search,
+  "A unit and period" should "return the specific unit record of the specified period" taggedAs(CloudFoundry,Gateway,  Api, Search,
     PeriodSearch, Enterprise) in {
     request.singleGETRequest(s"$sbrBaseUrl/v1/periods/$defaultPeriod/search?id=$enterpriseUnit2").map{ resp =>
       resp.json.as[Seq[JsValue]].nonEmpty shouldEqual true
@@ -56,7 +56,7 @@ class SystemSpec extends TestUtils {
     }
   }
 
-  "A legal unit search" should "call the bi api to GET result with unit result" taggedAs(Api, Search, LegalUnit) in {
+  "A legal unit search" should "call the bi api to GET result with unit result" taggedAs(CloudFoundry,Gateway,  Api, Search, LegalUnit) in {
     request.singleGETRequest(s"$sbrBaseUrl/v1/leus/$legalUnit").map { resp =>
       (resp.json \ "parents" \ "ENT").as[String].toLong shouldEqual expectedENTParent1
       (resp.json \ "unitType").as[String] shouldEqual "LEU"
@@ -65,7 +65,7 @@ class SystemSpec extends TestUtils {
     }
   }
 
-  "An enterprise unit search" should "call the sbr control api to GET result with unit result" taggedAs(Api, Search,
+  "An enterprise unit search" should "call the sbr control api to GET result with unit result" taggedAs(CloudFoundry, Gateway, Api, Search,
     Enterprise) in {
     request.singleGETRequest(s"$sbrBaseUrl/v1/ents/$enterpriseUnit1").map { resp =>
       (resp.json.as[JsValue] \ "id").as[String].toLong shouldEqual enterpriseUnit1
@@ -78,7 +78,7 @@ class SystemSpec extends TestUtils {
     }
   }
 
-  "A VAT unit search" should "call the admin data to GET result with unit result" taggedAs(Api, Search, VAT) in {
+  "A VAT unit search" should "call the admin data to GET result with unit result" taggedAs(CloudFoundry, Gateway, Api, Search, VAT) in {
     request.singleGETRequest(s"$sbrBaseUrl/v1/vats/$vatUnit").map { resp =>
       (resp.json \ "parents" \ "ENT").as[String].toLong shouldEqual expectedENTParent1
       (resp.json \ "parents" \ "LEU").as[String].toLong shouldEqual expectedLEUParent1
@@ -89,7 +89,7 @@ class SystemSpec extends TestUtils {
     }
   }
 
-  "A Paye unit search" should "call the admin data to GET result with unit result" taggedAs(Api, Search, PAYE) in {
+  "A Paye unit search" should "call the admin data to GET result with unit result" taggedAs(CloudFoundry, Gateway, Api, Search, PAYE) in {
     request.singleGETRequest(s"$sbrBaseUrl/v1/payes/$payeUnit").map { resp =>
       (resp.json \ "parents" \ "ENT").as[String].toLong shouldEqual expectedENTParent1
       (resp.json \ "parents" \ "LEU").as[String].toLong shouldEqual expectedLEUParent1
@@ -101,7 +101,7 @@ class SystemSpec extends TestUtils {
   }
 
   "A company house reference number (CRN) unit search" should "call the admin data to GET result with unit " +
-    "result" taggedAs(Api, Search, CompanyHouse) in {
+    "result" taggedAs(CloudFoundry, Gateway, Api, Search, CompanyHouse) in {
     request.singleGETRequest(s"$sbrBaseUrl/v1/crns/$chUnit").map { resp =>
       (resp.json \ "parents" \ "ENT").as[String].toLong shouldEqual expectedENTParent1
       (resp.json \ "parents" \ "LEU").as[String].toLong shouldEqual expectedLEUParent1
@@ -113,15 +113,15 @@ class SystemSpec extends TestUtils {
   }
 
 
-  "A legal unit and period search" should "call the bi api to GET result with unit result" taggedAs(Api, Search,
-    PeriodSearch, LegalUnit) in {
+  "A legal unit and period search" should "call the bi api to GET result with unit result" taggedAs(CloudFoundry, Gateway, Api,
+    Search, PeriodSearch, LegalUnit) in {
     request.singleGETRequest(s"$sbrBaseUrl/v1/periods/$defaultPeriod/leus/$legalUnit").map { resp =>
       resp.status shouldEqual NOT_IMPLEMENTED
     }
   }
 
-  "A enterprise unit and period search" should "call the sbr control api to GET result with unit result" taggedAs(Api,
-    Search, PeriodSearch, Enterprise) in {
+  "A enterprise unit and period search" should "call the sbr control api to GET result with unit result" taggedAs(
+    CloudFoundry, Gateway, Api, Search, PeriodSearch, Enterprise) in {
     request.singleGETRequest(s"$sbrBaseUrl/v1/periods/$defaultPeriod/ents/$enterpriseUnit1").map { resp =>
       (resp.json.as[JsValue] \ "id").as[String].toLong shouldEqual enterpriseUnit1
       // has some children matched to list
@@ -135,8 +135,8 @@ class SystemSpec extends TestUtils {
     }
   }
 
-  "A VAT unit and period search" should "call the admin data to GET result with unit result" taggedAs(Api, Search,
-    PeriodSearch, VAT) in {
+  "A VAT unit and period search" should "call the admin data to GET result with unit result" taggedAs(CloudFoundry,
+    Gateway, Api, Search, PeriodSearch, VAT) in {
     request.singleGETRequest(s"$sbrBaseUrl/v1/periods/$defaultPeriod/vats/$vatUnit").map { resp =>
       (resp.json \ "id").as[String].toLong shouldEqual vatUnit
       (resp.json \ "period").as[String] shouldEqual String.join(DELIMITER, defaultYearMonth.getYear.toString,
@@ -150,7 +150,8 @@ class SystemSpec extends TestUtils {
     }
   }
 
-  "A Paye unit and period search" should "call the admin data to GET result with unit result" taggedAs(Api, Search, PeriodSearch, PAYE) in {
+  "A Paye unit and period search" should "call the admin data to GET result with unit result" taggedAs(CloudFoundry,
+    Gateway, Api, Search, PeriodSearch, PAYE) in {
     request.singleGETRequest(s"$sbrBaseUrl/v1/periods/$defaultPeriod/payes/$payeUnit").map { resp =>
       (resp.json \ "id").as[String] shouldEqual payeUnit
       (resp.json \ "period").as[String] shouldEqual String.join(DELIMITER, defaultYearMonth.getYear.toString,
@@ -165,7 +166,8 @@ class SystemSpec extends TestUtils {
   }
 
   "A company house reference number (CRN) unit and period search" should
-    "call the admin data to GET result with unit result" taggedAs(Api, Search, PeriodSearch, CompanyHouse) in {
+    "call the admin data to GET result with unit result" taggedAs(CloudFoundry, Api, Search, PeriodSearch, Gateway,
+    CompanyHouse) in {
     request.singleGETRequest(s"$sbrBaseUrl/v1/periods/$defaultPeriod/crns/$chUnit").map { resp =>
       (resp.json \ "id").as[String] shouldEqual chUnit
       (resp.json \ "period").as[String] shouldEqual String.join(DELIMITER, defaultYearMonth.getYear.toString,
@@ -179,7 +181,7 @@ class SystemSpec extends TestUtils {
     }
   }
 
-  "Version request" should "GET a version listing" taggedAs(Api, Util) in {
+  "Version request" should "GET a version listing" taggedAs(CloudFoundry, Gateway, Api, Util) in {
     request.singleGETRequest(s"$sbrBaseUrl/version").map { resp =>
       (resp.json \ "moduleName").as[String] shouldEqual "sbr-api"
       (resp.json \ "scalaVersion").as[String] startsWith "2."
@@ -190,7 +192,7 @@ class SystemSpec extends TestUtils {
     }
   }
 
-  "Health request" should "GET a healthy status of the api" taggedAs(Api, Util) in {
+  "Health request" should "GET a healthy status of the api" taggedAs(CloudFoundry, Gateway, Api, Util) in {
     request.singleGETRequest(s"$sbrBaseUrl/health").map { resp =>
       (resp.json \ "Status").as[String] shouldEqual "Ok"
       resp.status shouldEqual OK
@@ -198,7 +200,7 @@ class SystemSpec extends TestUtils {
     }
   }
 
-  "Hitting the swagger docs route" should "GET the swagger doc ui to test endpoints" taggedAs(Api, Util) in {
+  "Hitting the swagger docs route" should "GET the swagger doc ui to test endpoints" taggedAs(CloudFoundry, Gateway, Api, Util) in {
     request.singleGETRequest(s"$sbrBaseUrl/docs").map { resp =>
       resp.status shouldEqual OK
       resp.header("Content-Type") shouldEqual Some(EXPECTED_DOCS_CONTENT_TYPE)
@@ -217,7 +219,7 @@ class SystemSpec extends TestUtils {
     * GET REQUESTS
      */
 
-  "A full business name request" should "GET ONS with children links" taggedAs(Control, Search, Enterprise) in {
+  "A full business name request" should "GET ONS with children links" taggedAs(CloudFoundry, Control, Search, Enterprise) in {
     request.singleGETRequest(s"$controlBaseUrl/v1/units/$enterpriseUnit1").map { resp =>
       resp.json.as[Seq[JsValue]].nonEmpty shouldEqual true
       (resp.json.as[Seq[JsValue]].head \ "id").as[String].toLong shouldEqual enterpriseUnit1
@@ -229,7 +231,7 @@ class SystemSpec extends TestUtils {
   }
 
   "A full business name request with a period path parameter" should
-    "GET ONS with children links of the given period" taggedAs(Control, Search, PeriodSearch, Enterprise) in {
+    "GET ONS with children links of the given period" taggedAs(CloudFoundry, Control, Search, PeriodSearch, Enterprise) in {
     request.singleGETRequest(s"$controlBaseUrl/v1/periods/$defaultPeriod/units/$enterpriseUnit2").map { resp =>
       resp.json.as[Seq[JsValue]].nonEmpty shouldEqual true
       (resp.json.as[Seq[JsValue]].head \ "id").as[String].toLong shouldEqual enterpriseUnit2
@@ -240,8 +242,8 @@ class SystemSpec extends TestUtils {
     }
   }
 
-  "A search on a unit with known type VAT" should "GET ONS VAT links record only" taggedAs(Control, Search,
-    TypeSearch, VAT) in {
+  "A search on a unit with known type VAT" should "GET ONS VAT links record only" taggedAs(CloudFoundry, Control,
+    Search, TypeSearch, VAT) in {
     request.singleGETRequest(s"$controlBaseUrl/v1/types/VAT/units/$vatUnit").map { resp =>
       (resp.json.as[JsValue] \ "id").as[String].toLong shouldEqual vatUnit
       // has some children matched to list
@@ -253,7 +255,7 @@ class SystemSpec extends TestUtils {
   }
 
   "A search on all three criteria" should "GET ONS links record matching that satisfies the given parameters" taggedAs(
-    Control, Search, PeriodSearch, TypeSearch, Enterprise) in {
+    CloudFoundry, Control, Search, PeriodSearch, TypeSearch, Enterprise) in {
     request.singleGETRequest(s"$controlBaseUrl/v1/periods/$defaultPeriod/types/ENT/units/$enterpriseUnit1").map {
       resp =>
       (resp.json.as[JsValue] \ "id").as[String].toLong shouldEqual enterpriseUnit1
@@ -264,8 +266,8 @@ class SystemSpec extends TestUtils {
     }
   }
 
-  "An enterprise search using ONS full name" should "GET ONS children links and enterprise details" taggedAs(Control,
-    Search, PeriodSearch, Enterprise) in {
+  "An enterprise search using ONS full name" should "GET ONS children links and enterprise details" taggedAs(
+    CloudFoundry, Control, Search, PeriodSearch, Enterprise) in {
     request.singleGETRequest(s"$controlBaseUrl/v1/periods/$defaultPeriod/enterprises/$enterpriseUnit1").map { resp =>
       (resp.json \ "id").as[Long] shouldEqual enterpriseUnit1
       (resp.json \ "childrenJson").as[Seq[JsValue]].nonEmpty shouldEqual true
@@ -277,7 +279,7 @@ class SystemSpec extends TestUtils {
     }
   }
 
-  "Version controller request for sbr-control" should "GET a version listing" taggedAs(Control, Util) in {
+  "Version controller request for sbr-control" should "GET a version listing" taggedAs(CloudFoundry, Control, Util) in {
     request.singleGETRequest(s"$controlBaseUrl/version").map { resp =>
       (resp.json \ "name").as[String] shouldEqual "sbr-control-api"
       (resp.json \ "scalaVersion").as[String] startsWith "2."
@@ -288,7 +290,8 @@ class SystemSpec extends TestUtils {
     }
   }
 
-  "Health controller request for sbr-control" should "GET a healthy status of the api" taggedAs(Control, Util) in {
+  "Health controller request for sbr-control" should "GET a healthy status of the api" taggedAs(CloudFoundry, Control,
+    Util) in {
     request.singleGETRequest(s"$controlBaseUrl/health").map { resp =>
       (resp.json \ "Status").as[String] shouldEqual "Ok"
       resp.status shouldEqual OK
@@ -297,7 +300,7 @@ class SystemSpec extends TestUtils {
   }
 
   "Hitting the swagger docs route request for sbr-control" should "GET the swagger doc ui to test endpoints" taggedAs(
-    Control, Util) in {
+    CloudFoundry, Control, Util) in {
     request.singleGETRequest(s"$controlBaseUrl/docs").map { resp =>
       resp.status shouldEqual OK
       resp.header("Content-Type") shouldEqual Some(EXPECTED_DOCS_CONTENT_TYPE)
@@ -315,7 +318,8 @@ class SystemSpec extends TestUtils {
     * GET REQUESTS
     */
 
-  "Version controller request for sbr-admin-data" should "GET a version listing" taggedAs(`Admin-Data`, Util) in {
+  "Version controller request for sbr-admin-data" should "GET a version listing" taggedAs(CloudFoundry,
+    `Admin-Data`, Util) in {
     request.singleGETRequest(s"$adminDataBaseUrl/version").map { resp =>
       (resp.json \ "name").as[String] startsWith "sbr-admin-data"
       (resp.json \ "scalaVersion").as[String] startsWith "2."
@@ -326,8 +330,8 @@ class SystemSpec extends TestUtils {
     }
   }
 
-  "Health controller request for sbr-admin-data" should "GET a healthy status of the api" taggedAs(`Admin-Data`,
-    Util) in {
+  "Health controller request for sbr-admin-data" should "GET a healthy status of the api" taggedAs(CloudFoundry,
+    `Admin-Data`, Util) in {
     request.singleGETRequest(s"$adminDataBaseUrl/health").map { resp =>
       (resp.json \ "Status").as[String] shouldEqual "Ok"
       resp.status shouldEqual OK
@@ -336,7 +340,7 @@ class SystemSpec extends TestUtils {
   }
 
   "Hitting the swagger docs route request for sbr-admin-data" should "GET the swagger doc ui to test " +
-    "endpoints" taggedAs(`Admin-Data`, Util) in {
+    "endpoints" taggedAs(CloudFoundry, `Admin-Data`, Util) in {
     request.singleGETRequest(s"$adminDataBaseUrl/docs").map { resp =>
       resp.status shouldEqual OK
       resp.header("Content-Type") shouldEqual Some(EXPECTED_DOCS_CONTENT_TYPE)

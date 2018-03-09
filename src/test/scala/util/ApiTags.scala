@@ -3,7 +3,7 @@ package util
 import org.scalatest.Tag
 
 /**
-  * ApiTags
+  * Api
   * ----------------
   * Author: haqa
   * Date: 19 December 2017 - 12:30
@@ -25,4 +25,5 @@ object PAYE extends Tag("uk.gov.ons.paye")
 object VAT extends Tag("uk.gov.ons.vat")
 object CompanyHouse extends Tag("uk.gov.ons.ch")
 
-
+object CloudFoundry extends Tag("uk.gov.ons.deployment.system.test.cloudfoundry")
+object Gateway extends Tag("uk.gov.ons.deployment.system.test.gateway")
