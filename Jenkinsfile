@@ -1,5 +1,5 @@
 #!groovy
-@Library('jenkins-pipeline-shared@develop') _
+@Library('jenkins-pipeline-shared') _
 
 pipeline {
     environment {
@@ -64,10 +64,8 @@ pipeline {
         stage ('Bundle') {
             agent any
             when {
-                anyOf {
-                    branch BRANCH_DEV
-                    branch BRANCH_TEST
-                    branch BRANCH_PROD
+                expression {
+                    isBranch(BRANCH_DEV) || isBranch(BRANCH_TEST) || isBranch(BRANCH_PROD)
                 }
             }
             steps {
@@ -99,10 +97,8 @@ pipeline {
         stage('Testing'){
             agent any
             when {
-                anyOf {
-                    branch BRANCH_DEV
-                    branch BRANCH_TEST
-                    branch BRANCH_PROD
+                expression {
+                    isBranch(BRANCH_DEV) || isBranch(BRANCH_TEST) || isBranch(BRANCH_PROD)
                 }
             }
             steps {
@@ -156,3 +152,6 @@ pipeline {
 }
 
 
+def isBranch(String branchName){
+    return env.BRANCH_NAME.toString().equals(branchName)
+}
